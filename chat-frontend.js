@@ -5,6 +5,8 @@
     var content = $('#content');
     var input = $('#input');
     var status = $('#status');
+    var chatId = $('#chatId span');
+    var chatList = $('#chatList div');
 
     // my color assigned by the server
     var myColor = false;
@@ -17,7 +19,7 @@
     function connect(){
         
         // open connection
-        var connection = new WebSocket('ws://localhost:1337');
+        var connection = new WebSocket('ws://192.168.1.3:1337');
         
         input.val('Connecting...');
 
@@ -66,13 +68,18 @@
                     addMessage(json.data[i].author, json.data[i].text,
                             json.data[i].color, new Date(json.data[i].time));
                 }
+            } else if(json.type === 'chatId') {
+                chatId.html(json.data);
             } else if (json.type === 'message') { // it's a single message
                 input.removeAttr('disabled'); // let the user write another message
                 addMessage(json.data.author, json.data.text,
                         json.data.color, new Date(json.data.time));
+            } else if (json.type === 'userlist' && typeof json.data === 'object') {
+                updateUsersList(json.data);
             } else {
                 console.log('Hmm..., I\'ve never seen JSON like this: ', json);
             }
+            
         };
         
         return connection;
@@ -109,6 +116,24 @@
              + (dt.getHours() < 10 ? '0' + dt.getHours() : dt.getHours()) + ':'
              + (dt.getMinutes() < 10 ? '0' + dt.getMinutes() : dt.getMinutes())
              + ': ' + message + '</p>');
+         //scroll to bottom;
+         scroolToBottom(content);
+    }
+    
+    function parseDate(dt){
+        
+        return (dt.getHours() < 10 ? '0' + dt.getHours() : dt.getHours()) + ':'
+            + (dt.getMinutes() < 10 ? '0' + dt.getMinutes() : dt.getMinutes());
+    }
+    
+    function updateUsersList(userlist){
+        var html = '', i=0;
+        for (i; i < userlist.length; i++) {
+            if (userlist[i]){
+                html += '<p style="color: ' + userlist[i].color +' ">' + userlist[i].name + ' @ ' + parseDate(new Date(userlist[i].time)) + '</p>';
+            }
+        }
+        chatList.html(html);        
     }
 
     /**
@@ -127,6 +152,7 @@
             clearInterval(offlineMonitorID);
             onlineMonitorID = setInterval(onlineMonitor,5000);
         }
+        
     };
 
     function onlineMonitor(){
@@ -140,6 +166,40 @@
         }
         
     };
+    
+    $('a').live('click', function(e) {
+        var href = e.target.href;
+        if (href.indexOf('youtube')>-1){
+            e.preventDefault();
+            var youtubeCcode = href.match(/v=([^&]*)/i);
+            console.log(youtubeCcode);
+            $('#youtube').html('<object width="600" height="400" data="http://www.youtube.com/v/' + youtubeCcode[1] + '" type="application/x-shockwave-flash"><param name="src" value="http://www.youtube.com/v/' + youtubeCcode[1] + '" /></object>');
+        }        
+    });
+    
+    function scroolToBottom(div){
+        //div.scrollTop = div.scrollHeight;
+        console.log(div.prop('scrollHeight'));
+        div.scrollTop(div.prop('scrollHeight'));
+    }
+    
+    window.onbeforeunload = function (evt) {
+        if (myName && connection.readyState == 1) { // prevent if user is logged in
+            /*
+                * On IE, the text must be set in evt.returnValue.
+                *
+                * On Firefox, it must be returned as a string.
+                *
+                * On Chrome, it must be returned as a string, but you
+                * can't set it on evt.returnValue (it just ignores it).
+                */
+            var msg = myName + ", If you reload or close you will automatically leave chat.";
+            evt = evt || window.event;
+
+            evt.returnValue = msg;
+            return msg;
+        }
+    }
     
     // if user is running mozilla then use it's built-in WebSocket
     window.WebSocket = window.WebSocket || window.MozWebSocket;

@@ -5,24 +5,59 @@
         <title>WebSockets - Simple chat</title>
 
         <style>
-        * { font-family:tahoma; font-size:12px; padding:0px; margin:0px; }
-        p { line-height:18px; }
-        div { width:500px; margin-left:auto; margin-right:auto;}
-        #content { padding:5px; background:#ddd; border-radius:5px;
-                   border:1px solid #CCC; margin-top:10px; }
-        #input { border-radius:2px; border:1px solid #ccc;
-                 margin-top:10px; padding:5px; width:400px;  }
-        #status { width:88px; display:block; float:left; margin-top:15px; }
+            * { font-family:tahoma; font-size:12px; padding:0px; margin:0px; }
+
+            h1 { font-family: arial; font-size: 20px;}
+
+            p { line-height:18px; }
+
+            div.left {float: left; width: 600px;}
+            
+            div.center {width:500px; margin-left:auto; margin-right:auto;}
+
+            #content { padding:5px; background:#ddd; border-radius:5px;
+                    border:1px solid #CCC; margin-top:10px; overflow: hidden; max-height: 500px; overflow-y: scroll;}
+
+            #chatList {padding:5px; width: 130px; background-color: white; border-radius:5px; position: absolute; top: 60px; margin-left: 340px;}
+
+            #chatList p {text-align: right;}
+
+            #input { border-radius:2px; border:1px solid #ccc;
+                    margin-top:10px; padding:5px; width:400px;  }
+
+            #status { width:88px; display:block; float:left; margin-top:15px; }
+
+            #youtube {float: right; background-color: lightgray; width: 600px; height: 400px;}
+
         </style>
     </head>
     <body>
-        <div id="content"></div>
-        <div>
-            <span id="status">Connecting...</span>
-            <input type="text" id="input" disabled="disabled" />
+
+        <div id="youtube"></div>
+
+        <div class="left">
+
+            <div class="center">
+                <h1>Node.js websocket chat!</h1>
+                <h2>U can use http... links as usernames and in msgs :)</h2>
+                <div id="chatId"><span></span></div>
+            </div>
+
+            <div id="content" class="center">
+                <div id="chatList">
+                    <h2>Currently on chat:</h2>
+                    <div>U are not logged in..</div>
+                </div>
+            </div>
+
+            <div class="center">
+                <span id="status">Connecting...</span>
+                <input type="text" id="input" disabled="disabled" />
+            </div>
+
         </div>
-        
-        <script src="jquery.js"></script>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
         <script src="chat-frontend.js"></script>
     </body>
 </html>
